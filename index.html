@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
+  <title>Pinterest Masonry (CSS Columns)</title>
+
+</head>
+<body>
+  <header>
+    <input id="seed" placeholder="Masalan: cats, nature, city..." value="nature" />
+    <button id="reload">Yangi rasmlar</button>
+  </header>
+
+  <main class="masonry" id="grid"></main>
+
+  <script>
+    /**
+     * Demo uchun Picsum API ishlatyapmiz.
+     * Har rasm turli o'lchamda keladi, Pinterestga o'xshab ustunlarda joylashadi.
+     */
+
+    const grid = document.getElementById("grid");
+    const seedInput = document.getElementById("seed");
+    const reloadBtn = document.getElementById("reload");
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function makeCard({ url, w, h, label }) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.src = url;
+      img.alt = label;
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML = `
+        <span>${label}</span>
+        <span class="tag">${w}×${h}</span>
+      `;
+
+      card.appendChild(img);
+      card.appendChild(meta);
+      return card;
+    }
+
+    function loadImages() {
+      grid.innerHTML = "";
+
+      const seed = (seedInput.value || "nature").trim();
+      // 24 ta rasm
+      for (let i = 0; i < 10; i++) {
+        // Turli o'lchamlar: Pinterestdagi "har xil bo'y-bast"
+        const w = rand(300, 520);
+        const h = rand(220, 900);
+
+        // Picsum: har xil rasm, har xil o'lcham
+        // seedni URLga qo'shib "mavzu" hissini beramiz (visual: shunchaki string)
+        const id = rand(1, 999);
+        const url = `https://picsum.photos/seed/${encodeURIComponent(seed)}-${id}/${w}/${h}`;
+
+        const card = makeCard({
+          url,
+          w,
+          h,
+          label: `Pin #${i + 1}`
+        });
+
+        grid.appendChild(card);
+      }
+    }
+
+    reloadBtn.addEventListener("click", loadImages);
+    seedInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loadImages();
+    });
+
+    loadImages();
+  </script>
+</body>
+</html>
